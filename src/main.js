@@ -1,6 +1,7 @@
 import './style.css';
 import { evaluate, derivative, parse } from 'mathjs';
 import { renderCodeLab, renderVerilogLab } from './coding.js';
+import { renderCircuitLab } from './circuitlab.js';
 
 const $ = (s) => document.querySelector(s);
 const app = $('#app');
@@ -12,7 +13,7 @@ let sciExpression = '';
 let sciAnswer = '0';
 const tabs = [
   ['standard','Calculator'], ['scientific','Scientific'], ['calculus','∫ Calculus'],
-  ['age','Age'], ['tax','Tax'], ['split','Split'], ['currency','Currency'], ['convert','Convert'], ['logic','Logic Gates'], ['signals','Signal Graphs'], ['code','Code Studio'], ['verilog','Verilog']
+  ['age','Age'], ['tax','Tax'], ['split','Split'], ['currency','Currency'], ['convert','Convert'], ['logic','Logic Gates'], ['signals','Signal Graphs'], ['code','Code Studio'], ['verilog','Verilog'], ['circuit','Circuit Lab']
 ];
 const symbols = ['sin','cos','tan','asin','acos','atan','√','ln','log','π','e','x²','(',')','÷','×','−','+'];
 const esc = (s) => String(s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
@@ -43,6 +44,7 @@ function renderPanel(){
  if(active==='signals') return signalGraphs(p);
  if(active==='code') return renderCodeLab(p);
  if(active==='verilog') return renderVerilogLab(p);
+ if(active==='circuit') return renderCircuitLab(p);
 }
 function calculator(p, sci){
  const val=sci?sciExpression:expression, result=sci?sciAnswer:answer;
