@@ -6,6 +6,13 @@
   <meta name="theme-color" content="#10131b" />
   <link rel="icon" type="image/png" href="/icon.png" />
   <meta name="theme-color" content="#10131b" />
+  <style>
+    /* Keep the app content below notches and front-camera cutouts on edge-to-edge displays. */
+    #app > .shell { padding-top: max(26px, env(safe-area-inset-top, 0px)); }
+    @media (max-width: 600px) {
+      #app > .shell { padding-top: max(18px, env(safe-area-inset-top, 0px)); }
+    }
+  </style>
   <title>IonCalc — Calculator Toolkit</title>
 </head>
 <body>
