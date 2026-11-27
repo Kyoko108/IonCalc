@@ -1,7 +1,0 @@
-{
-  "appId": "com.ioncalc.toolkit",
-  "appName": "IonCalc",
-  "webDir": "dist",
-  "bundledWebRuntime": false,
-  "server": { "androidScheme": "https" }
-}
