@@ -47,7 +47,7 @@ function renderCircuitLab(host) {
   function parsePin(s){const [id,i]=s.split(':').map(Number);return {id, i};}
   svg.addEventListener('click',e=>{
     const pin=e.target.closest('[data-pin]');
-    if(wireStart!==null && pin){const end=parsePin(pin.dataset.pin);if(wireStart.id!==end.id||wireStart.i!==end.i)wires.push({a:wireStart.id,ai:wireStart.i,b:end.id,bi:end.i});wireStart=null;host.querySelector('#cl-wire').classList.remove('active');host.querySelector('#cl-wire').textContent='Wire: off';draw();return;}
+    if(wireStart!==null && pin){const end=parsePin(pin.dataset.pin);if(wireStart.id!==end.id||wireStart.i!==end.i)wires.push({a:wireStart.id,ai:wireStart.i,b:end.id,bi:end.i});wireStart=null;host.querySelector('#cl-wire').classList.remove('active');host.querySelector('#cl-wire').textContent='Wire: off';draw();e.stopImmediatePropagation();return;}
     const g=e.target.closest('[data-part]');
     if(g){selected=Number(g.dataset.part);draw();}
   });
