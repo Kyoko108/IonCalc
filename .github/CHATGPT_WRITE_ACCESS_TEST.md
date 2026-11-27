@@ -1,0 +1,1 @@
+Temporary write-access verification for the ChatGPT GitHub connection. This file is removed immediately after the test.
