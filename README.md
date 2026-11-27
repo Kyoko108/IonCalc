@@ -129,3 +129,10 @@ The workflow produces a **debug APK** for testing and sideloading. A Play Store 
 ## License
 
 No open-source license has been specified yet. Unless a license is added, the source is provided without an express license to reuse, modify, or redistribute it.
+
+
+## Circuit Lab (Beta)
+
+IonCalc includes an educational analog schematic workspace. It supports placing and moving resistors, ideal DC voltage sources and ground symbols, connecting component pins with wires, editing component references and values, and solving a basic DC operating point for resistor/source networks.
+
+**Current scope:** this is an early educational DC solver, not a full LTspice/SPICE replacement. It does not yet implement transient or AC analysis, semiconductor device models, vendor SPICE models, advanced convergence controls, or full schematic routing. Validate circuit results independently before using them in hardware designs.
