@@ -5,9 +5,9 @@
 ## Features
 
 ### Calculators and engineering tools
-- **Standard calculator** with keyboard-friendly expression entry.
+- **Analog Circuit Lab** replaces the standard calculator as the opening workspace, with an LTspice-inspired schematic editor and component library.
 - **Scientific calculator** with trigonometry, inverse trigonometry, logarithms, roots, powers, constants, and parentheses.
-- **Calculus tools:** symbolic differentiation and numerical definite integration using Simpson's rule.
+- **Calculus tools:** symbolic differentiation and numerical definite integration using Simpson's rule; the function expression field uses text input for a full QWERTY keyboard.
 - **Everyday utilities:** age calculator, GST estimator, bill splitter, currency converter, and unit converter.
 - **Signal graphing:** plot continuous-time signals `x(t)` and discrete-time sequences `x[n]` from editable Math.js expressions.
 - **Logic-gate simulator:** experiment with AND, OR, NOT, NAND, NOR, XOR, and XNOR gates using live input switches and truth tables.
