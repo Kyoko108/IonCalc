@@ -15,7 +15,7 @@ const tabs = [
   ['scientific','Scientific'], ['calculus','∫ Calculus'],
   ['age','Age'], ['tax','Tax'], ['split','Split'], ['currency','Currency'], ['convert','Convert'], ['logic','Logic Gates'], ['signals','Signal Graphs'], ['code','Code Studio'], ['verilog','Verilog'], ['circuit','Circuit Lab']
 ];
-const symbols = ['sin','cos','tan','asin','acos','atan','√','ln','log','π','e','x²','(',')','÷','×','−','+'];
+const symbols = ['sin','cos','tan','asin','acos','atan','√','ln','log','π','e','x²','!','nPr','nCr','(',')','÷','×','−','+'];
 const esc = (s) => String(s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 function shell() {
  app.innerHTML = `<div class="shell">
@@ -60,13 +60,13 @@ function calcKey(k,sci){
  const set=(nv,nr=r)=>{if(sci){sciExpression=nv;sciAnswer=nr;}else{expression=nv;answer=nr;}calculator($('#panel'),sci);};
  if(k==='AC') return set('','0');
  if(k==='⌫') return set(v.slice(0,-1),'0');
- if(k==='='){try{const clean=v.replace(/×/g,'*').replace(/÷/g,'/').replace(/−/g,'-').replace(/π/g,'pi').replace(/√/g,'sqrt').replace(/x²/g,'^2');set(v,String(evaluate(clean)));}catch{set(v,'Error');}return;}
- if(k==='±') return set(v.startsWith('-')?v.slice(1):'-'+v);
+ if(k==='='){try{const clean=v.replace(/×/g,'*').replace(/÷/g,'/').replace(/−/g,'-').replace(/π/g,'pi').replace(/√/g,'sqrt').replace(/x²/g,'^2');const factorial=n=>{if(!Number.isInteger(n)||n<0||n>170)throw Error('Factorial requires an integer from 0 to 170.');let z=1;for(let i=2;i<=n;i++)z*=i;return z;};const choose=(n,r)=>{if(!Number.isInteger(n)||!Number.isInteger(r)||n<0||r<0||r>n||n>170)throw Error('n and r must be integers with 0 ≤ r ≤ n ≤ 170.');let z=1;for(let i=1;i<=r;i++)z=z*(n-r+i)/i;return Math.round(z);};const scope={factorial,nPr:(n,r)=>choose(n,r)*factorial(r),nCr:choose};set(v,String(evaluate(clean,scope)));}catch{set(v,'Error');}return;}
+ if(k==='±') return set(v.startsWith('-')?v.slice(1):'-'+v);\n if(k==='nPr'||k==='nCr') return set(v+k+'(','0');\n if(k==='!') return set(v+'!','0');
  if(k==='%') return set(v+'/100');
  const map={'×':'*','÷':'/','−':'-','π':'pi','√':'sqrt(','ln':'log(','log':'log10(','sin':'sin(','cos':'cos(','tan':'tan(','asin':'asin(','acos':'acos(','atan':'atan(','x²':'^2'};
  set(v+(map[k]??k),'0');
 }
-function cardHead(kicker,title,chip='TOOL'){return `<div class="cardhead"><div><span class="eyebrow">${kicker}</span><h2>${title}</h2></div><span class="chip">${chip}</span></div>`}
+function normalizePowers(s){const sup={'⁰':'0','¹':'1','²':'2','³':'3','⁴':'4','⁵':'5','⁶':'6','⁷':'7','⁸':'8','⁹':'9','⁻':'-','⁺':'+'};return String(s).replace(/[⁰¹²³⁴⁵⁶⁷⁸⁹⁻⁺]+/g,m=>'^('+[...m].map(c=>sup[c]).join('')+')').replace(/x\s*\^\s*\(([-+]?\d+)\)/g,'x^$1');}\nfunction cardHead(kicker,title,chip='TOOL'){return `<div class="cardhead"><div><span class="eyebrow">${kicker}</span><h2>${title}</h2></div><span class="chip">${chip}</span></div>`}
 function field(label,id,placeholder='',type='number',value=''){return `<label class="field">${label}<input id="${id}" type="${type}" placeholder="${placeholder}" value="${value}"></label>`}
 function output(id){return `<div class="output" id="${id}">Your result will appear here.</div>`}
 function calculus(p){
@@ -74,13 +74,13 @@ function calculus(p){
  <div class="switchrow"><span>Choose operation</span><div class="seg"><button class="active" id="diffBtn">Differential</button><button id="intBtn">Integral</button></div></div>
  <div class="grid2">${field('Function f(x)','fn','e.g. x^3 + 2*x','text')}${field('Evaluate at x =','atx','e.g. 2')}</div>
  <div id="integralBounds" class="grid2 hidden">${field('Lower bound','lower','e.g. 0')}${field('Upper bound','upper','e.g. 2')}</div>
- <button class="primary" id="solveCalc">Calculate</button>${output('calcOut')}
+ <button class="primary" id="solveCalc">Calculate</button>${output('calcOut').replace('class="output"','class="output calc-output"')}
  <p class="hint">Differentiation uses symbolic differentiation. Definite integration uses numerical Simpson’s rule. Enter expressions using * for multiplication.</p></section>`;
  let op='diff'; const db=$('#diffBtn'), ib=$('#intBtn'), bounds=$('#integralBounds');
  db.onclick=()=>{op='diff';db.classList.add('active');ib.classList.remove('active');bounds.classList.add('hidden');};
  ib.onclick=()=>{op='int';ib.classList.add('active');db.classList.remove('active');bounds.classList.remove('hidden');};
  $('#solveCalc').onclick=()=>{
-  try{const f=$('#fn').value.trim();if(!f)throw Error('Enter a function first.');
+  try{const f=normalizePowers($('#fn').value.trim());if(!f)throw Error('Enter a function first.');
    if(op==='diff'){const d=derivative(f,'x').toString();const x=Number($('#atx').value||0);$('#calcOut').innerHTML=`<small>DERIVATIVE</small><strong>f′(x) = ${esc(d)}</strong><span>At x = ${x}: ${Number(evaluate(d,{x})).toPrecision(8)}</span>`;}
    else{const a=Number($('#lower').value),b=Number($('#upper').value);if(!Number.isFinite(a)||!Number.isFinite(b)||a===b)throw Error('Enter two different finite bounds.');const n=1000,h=(b-a)/n;let sum=evaluate(f,{x:a})+evaluate(f,{x:b});for(let i=1;i<n;i++)sum+=(i%2?4:2)*evaluate(f,{x:a+i*h});$('#calcOut').innerHTML=`<small>DEFINITE INTEGRAL · SIMPSON’S RULE</small><strong>∫ f(x) dx ≈ ${((h/3)*sum).toPrecision(10)}</strong><span>From ${a} to ${b}</span>`;}
   }catch(e){$('#calcOut').textContent='Could not calculate: '+e.message;}
