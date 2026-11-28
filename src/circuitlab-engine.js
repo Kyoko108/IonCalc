@@ -4,7 +4,7 @@
 // This is a learning simulator, not a validated vendor-compatible SPICE engine.
 const PIN={
  resistor:2,capacitor:2,inductor:2,voltage:2,current:2,ground:1,diode:2,
- vcv:4,vccs:4,ccvs:4,cccs:4,opamp:5,mosfet:3,bjt:3
+ vcv:4,vccs:4,ccvs:4,cccs:4,opamp:5,mosfet:3,bjt:3,voltmeter:2,ammeter:2,scope:2
 };
 const clamp=(x,a,b)=>Math.max(a,Math.min(b,x));
 function solveLinear(A,b){
@@ -55,6 +55,8 @@ function solveNetwork(parts,wires,{mode='dc',dt=.0001,capPrev=new Map(),indPrev=
   // Tiny gmin prevents numerically isolated nonlinear junctions from singularity.
   for(let i=0;i<n;i++)A[i][i]+=1e-12;
   parts.filter(p=>p.type==='resistor').forEach(p=>{const r=Number(p.value);if(!(r>0))throw Error(p.ref+': resistance must be positive.');conduct(node(p,0),node(p,1),1/r);});
+  parts.filter(p=>p.type==='voltmeter'||p.type==='scope').forEach(p=>conduct(node(p,0),node(p,1),1e-12));
+  parts.filter(p=>p.type==='ammeter').forEach(p=>conduct(node(p,0),node(p,1),1e6));
   parts.filter(p=>p.type==='current').forEach(p=>inject(node(p,0),node(p,1),Number(p.value)||0));
   parts.filter(p=>p.type==='diode').forEach(p=>{const a=node(p,0),c=node(p,1),d=diodeModel(v(x,p,0)-v(x,p,1),Number(p.is??1e-12),Number(p.n??1));conduct(a,c,d.g);inject(a,c,d.ieq);});
   parts.filter(p=>p.type==='capacitor'&&mode==='transient').forEach(p=>{const c=Number(p.value);if(!(c>0))throw Error(p.ref+': capacitance must be positive.');const geq=c/dt,vprev=capPrev.get(p.id)||0;conduct(node(p,0),node(p,1),geq);inject(node(p,0),node(p,1),-geq*vprev);});
@@ -86,6 +88,8 @@ function solveNetwork(parts,wires,{mode='dc',dt=.0001,capPrev=new Map(),indPrev=
   if(p.type==='resistor')currents[p.ref]=dv/Number(p.value);
   else if(p.type==='voltage'||p.type==='vcv'||p.type==='ccvs'||p.type==='opamp')currents[p.ref]=x[branchIndex.get(p.id)];
   else if(p.type==='current')currents[p.ref]=Number(p.value)||0;
+  else if(p.type==='voltmeter'||p.type==='scope')currents[p.ref]=dv*1e-12;
+  else if(p.type==='ammeter')currents[p.ref]=dv*1e6;
   else if(p.type==='diode')currents[p.ref]=diodeModel(dv,Number(p.is??1e-12),Number(p.n??1)).g*dv+diodeModel(dv,Number(p.is??1e-12),Number(p.n??1)).ieq;
   else if(p.type==='capacitor')currents[p.ref]=mode==='transient'?Number(p.value)*(dv-(capPrev.get(p.id)||0))/dt:0;
   else if(p.type==='inductor')currents[p.ref]=mode==='transient'?x[branchIndex.get(p.id)]:(x[branchIndex.get(p.id)]||0);
