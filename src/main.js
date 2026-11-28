@@ -66,7 +66,7 @@ function calcKey(k,sci){
  if(k==='!') return set(v+'!','0');
  if(k==='10ˣ') return set(v+'10^(','0');
  if(k==='2ˣ') return set(v+'2^(','0');
- if(k==='xʸ') return set(v+'^(','0');
+ if(k==='xʸ') return set(v+'^','0');
  if(k==='%') return set(v+'/100');
  const map={'×':'*','÷':'/','−':'-','π':'pi','√':'sqrt(','ln':'log(','log':'log10(','sin':'sin(','cos':'cos(','tan':'tan(','asin':'asin(','acos':'acos(','atan':'atan(','x²':'^2','10ˣ':'10^(','2ˣ':'2^(','xʸ':'^('};
  set(v+(map[k]??k),'0');
