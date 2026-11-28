@@ -13,7 +13,7 @@
 - **Logic-gate simulator:** experiment with AND, OR, NOT, NAND, NOR, XOR, and XNOR gates using live input switches and truth tables.
 
 ### Code Studio and learning spaces
-- **8085 and 8086 assembly:** edit sample programs and step through a supported subset of instructions while observing registers and flags.
+- **8085 and 8086 assembly:** edit sample programs and step through a supported educational subset of instructions while observing registers and flags. Full instruction-set coverage is still under development.
 - **Python:** write and run Python in the browser using Pyodide WebAssembly.
 - **Java:** submit Java code to the Piston online execution service and view compiler/runtime output.
 - **Verilog Learning Space:** explore editable examples for AND gates, multiplexers, counters, and flip-flops, with basic structure checks and selected truth-table helpers.
