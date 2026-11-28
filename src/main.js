@@ -61,12 +61,15 @@ function calcKey(k,sci){
  if(k==='AC') return set('','0');
  if(k==='⌫') return set(v.slice(0,-1),'0');
  if(k==='='){try{const clean=v.replace(/×/g,'*').replace(/÷/g,'/').replace(/−/g,'-').replace(/π/g,'pi').replace(/√/g,'sqrt').replace(/x²/g,'^2');const factorial=n=>{if(!Number.isInteger(n)||n<0||n>170)throw Error('Factorial requires an integer from 0 to 170.');let z=1;for(let i=2;i<=n;i++)z*=i;return z;};const choose=(n,r)=>{if(!Number.isInteger(n)||!Number.isInteger(r)||n<0||r<0||r>n||n>170)throw Error('n and r must be integers with 0 ≤ r ≤ n ≤ 170.');let z=1;for(let i=1;i<=r;i++)z=z*(n-r+i)/i;return Math.round(z);};const scope={factorial,nPr:(n,r)=>choose(n,r)*factorial(r),nCr:choose};set(v,String(evaluate(clean,scope)));}catch{set(v,'Error');}return;}
- if(k==='±') return set(v.startsWith('-')?v.slice(1):'-'+v);\n if(k==='nPr'||k==='nCr') return set(v+k+'(','0');\n if(k==='!') return set(v+'!','0');
+ if(k==='±') return set(v.startsWith('-')?v.slice(1):'-'+v);
+ if(k==='nPr'||k==='nCr') return set(v+k+'(','0');
+ if(k==='!') return set(v+'!','0');
  if(k==='%') return set(v+'/100');
  const map={'×':'*','÷':'/','−':'-','π':'pi','√':'sqrt(','ln':'log(','log':'log10(','sin':'sin(','cos':'cos(','tan':'tan(','asin':'asin(','acos':'acos(','atan':'atan(','x²':'^2'};
  set(v+(map[k]??k),'0');
 }
-function normalizePowers(s){const sup={'⁰':'0','¹':'1','²':'2','³':'3','⁴':'4','⁵':'5','⁶':'6','⁷':'7','⁸':'8','⁹':'9','⁻':'-','⁺':'+'};return String(s).replace(/[⁰¹²³⁴⁵⁶⁷⁸⁹⁻⁺]+/g,m=>'^('+[...m].map(c=>sup[c]).join('')+')').replace(/x\s*\^\s*\(([-+]?\d+)\)/g,'x^$1');}\nfunction cardHead(kicker,title,chip='TOOL'){return `<div class="cardhead"><div><span class="eyebrow">${kicker}</span><h2>${title}</h2></div><span class="chip">${chip}</span></div>`}
+function normalizePowers(s){const sup={'⁰':'0','¹':'1','²':'2','³':'3','⁴':'4','⁵':'5','⁶':'6','⁷':'7','⁸':'8','⁹':'9','⁻':'-','⁺':'+'};return String(s).replace(/[⁰¹²³⁴⁵⁶⁷⁸⁹⁻⁺]+/g,m=>'^('+[...m].map(c=>sup[c]).join('')+')').replace(/x\s*\^\s*\(([-+]?\d+)\)/g,'x^$1');}
+function cardHead(kicker,title,chip='TOOL'){return `<div class="cardhead"><div><span class="eyebrow">${kicker}</span><h2>${title}</h2></div><span class="chip">${chip}</span></div>`}
 function field(label,id,placeholder='',type='number',value=''){return `<label class="field">${label}<input id="${id}" type="${type}" placeholder="${placeholder}" value="${value}"></label>`}
 function output(id){return `<div class="output" id="${id}">Your result will appear here.</div>`}
 function calculus(p){
