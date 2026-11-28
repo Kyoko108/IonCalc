@@ -5,15 +5,15 @@
 ## Features
 
 ### Calculators and engineering tools
-- **Standard calculator** with keyboard-friendly expression entry.
+- **Analog Circuit Lab** replaces the standard calculator as the opening workspace, with an LTspice-inspired schematic editor and component library.
 - **Scientific calculator** with trigonometry, inverse trigonometry, logarithms, roots, powers, constants, and parentheses.
-- **Calculus tools:** symbolic differentiation and numerical definite integration using Simpson's rule.
+- **Calculus tools:** symbolic differentiation and numerical definite integration using Simpson's rule; the function expression field uses text input for a full QWERTY keyboard.
 - **Everyday utilities:** age calculator, GST estimator, bill splitter, currency converter, and unit converter.
 - **Signal graphing:** plot continuous-time signals `x(t)` and discrete-time sequences `x[n]` from editable Math.js expressions.
 - **Logic-gate simulator:** experiment with AND, OR, NOT, NAND, NOR, XOR, and XNOR gates using live input switches and truth tables.
 
 ### Code Studio and learning spaces
-- **8085 and 8086 assembly:** edit sample programs and step through a supported subset of instructions while observing registers and flags.
+- **8085 and 8086 assembly:** edit sample programs and step through a supported educational subset of instructions while observing registers and flags. Full instruction-set coverage is still under development.
 - **Python:** write and run Python in the browser using Pyodide WebAssembly.
 - **Java:** submit Java code to the Piston online execution service and view compiler/runtime output.
 - **Verilog Learning Space:** explore editable examples for AND gates, multiplexers, counters, and flip-flops, with basic structure checks and selected truth-table helpers.
@@ -129,3 +129,10 @@ The workflow produces a **debug APK** for testing and sideloading. A Play Store 
 ## License
 
 No open-source license has been specified yet. Unless a license is added, the source is provided without an express license to reuse, modify, or redistribute it.
+
+
+## Circuit Lab (Beta)
+
+IonCalc includes an educational analog schematic workspace. It supports placing and moving resistors, ideal DC voltage sources and ground symbols, connecting component pins with wires, editing component references and values, and solving a basic DC operating point for resistor/source networks.
+
+**Current scope:** this is an early educational DC solver, not a full LTspice/SPICE replacement. It does not yet implement transient or AC analysis, semiconductor device models, vendor SPICE models, advanced convergence controls, or full schematic routing. Validate circuit results independently before using them in hardware designs.

@@ -1,18 +1,19 @@
 import './style.css';
 import { evaluate, derivative, parse } from 'mathjs';
 import { renderCodeLab, renderVerilogLab } from './coding.js';
+import { renderCircuitLab } from './circuitlab.js';
 
 const $ = (s) => document.querySelector(s);
 const app = $('#app');
 let mode = localStorage.getItem('ioncalc-theme') || 'dark';
-let active = 'standard';
+let active = 'circuit';
 let expression = '';
 let answer = '0';
 let sciExpression = '';
 let sciAnswer = '0';
 const tabs = [
-  ['standard','Calculator'], ['scientific','Scientific'], ['calculus','∫ Calculus'],
-  ['age','Age'], ['tax','Tax'], ['split','Split'], ['currency','Currency'], ['convert','Convert'], ['logic','Logic Gates'], ['signals','Signal Graphs'], ['code','Code Studio'], ['verilog','Verilog']
+  ['scientific','Scientific'], ['calculus','∫ Calculus'],
+  ['age','Age'], ['tax','Tax'], ['split','Split'], ['currency','Currency'], ['convert','Convert'], ['logic','Logic Gates'], ['signals','Signal Graphs'], ['code','Code Studio'], ['verilog','Verilog'], ['circuit','Circuit Lab']
 ];
 const symbols = ['sin','cos','tan','asin','acos','atan','√','ln','log','π','e','x²','(',')','÷','×','−','+'];
 const esc = (s) => String(s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
@@ -43,6 +44,7 @@ function renderPanel(){
  if(active==='signals') return signalGraphs(p);
  if(active==='code') return renderCodeLab(p);
  if(active==='verilog') return renderVerilogLab(p);
+ if(active==='circuit') return renderCircuitLab(p);
 }
 function calculator(p, sci){
  const val=sci?sciExpression:expression, result=sci?sciAnswer:answer;
@@ -70,7 +72,7 @@ function output(id){return `<div class="output" id="${id}">Your result will appe
 function calculus(p){
  p.innerHTML=`<section class="card">${cardHead('ENGINEERING MATHS','Integral & differential calculator','CALCULUS')}
  <div class="switchrow"><span>Choose operation</span><div class="seg"><button class="active" id="diffBtn">Differential</button><button id="intBtn">Integral</button></div></div>
- <div class="grid2">${field('Function f(x)','fn','e.g. x^3 + 2*x')}${field('Evaluate at x =','atx','e.g. 2')}</div>
+ <div class="grid2">${field('Function f(x)','fn','e.g. x^3 + 2*x','text')}${field('Evaluate at x =','atx','e.g. 2')}</div>
  <div id="integralBounds" class="grid2 hidden">${field('Lower bound','lower','e.g. 0')}${field('Upper bound','upper','e.g. 2')}</div>
  <button class="primary" id="solveCalc">Calculate</button>${output('calcOut')}
  <p class="hint">Differentiation uses symbolic differentiation. Definite integration uses numerical Simpson’s rule. Enter expressions using * for multiplication.</p></section>`;
