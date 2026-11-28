@@ -68,7 +68,7 @@ function solveNetwork(parts,wires,{mode='dc',dt=.0001,capPrev=new Map(),indPrev=
    if(p.type==='voltage')b[k]=Number(p.value)||0;
    if(p.type==='vcv'){const gain=Number(p.value)||1;const cp=node(p,2),cn=node(p,3);if(cp>=0)A[k][cp]-=gain;if(cn>=0)A[k][cn]+=gain;}
    if(p.type==='ccvs'){const ctrl=refBranch.get(String(p.controlRef||''));if(ctrl==null)throw Error(p.ref+': set Control reference to a voltage source or inductor reference.');A[k][ctrl]-=Number(p.value)||0;}
-   if(p.type==='opamp'){const gain=Number(p.value)||1e5,raw=gain*(v(x,p,0)-v(x,p,1));const hi=p.vpos==null?15:Number(p.vpos),lo=p.vneg==null?-15:Number(p.vneg);b[k]=clamp(raw,lo,hi);}
+   if(p.type==='opamp'){const gain=Number(p.value)||1e5,raw=gain*(v(x,p,0)-v(x,p,1));const hi=p.vpos==null?15:Number(p.vpos),lo=p.vneg==null?-15:Number(p.vneg);if(raw>=hi)b[k]=hi;else if(raw<=lo)b[k]=lo;else{const cp=node(p,0),cn=node(p,1);if(cp>=0)A[k][cp]-=gain;if(cn>=0)A[k][cn]+=gain;}}
   });
   inductors.forEach(p=>{const k=branchIndex.get(p.id),a=node(p,0),c=node(p,1);if(a>=0){A[a][k]++;A[k][a]++;}if(c>=0){A[c][k]--;A[k][c]--;}
    if(mode==='transient'){const L=Number(p.value);if(!(L>0))throw Error(p.ref+': inductance must be positive.');A[k][k]-=L/dt;b[k]=-L/dt*(indPrev.get(p.id)||0);}
