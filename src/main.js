@@ -15,7 +15,7 @@ const tabs = [
   ['scientific','Scientific'], ['calculus','∫ Calculus'],
   ['age','Age'], ['tax','Tax'], ['split','Split'], ['currency','Currency'], ['convert','Convert'], ['logic','Logic Gates'], ['signals','Signal Graphs'], ['code','Code Studio'], ['verilog','Verilog'], ['circuit','Circuit Lab']
 ];
-const symbols = ['sin','cos','tan','asin','acos','atan','√','ln','log','π','e','x²','!','nPr','nCr','(',')','÷','×','−','+'];
+const symbols = ['sin','cos','tan','asin','acos','atan','√','ln','log','π','e','x²','10ˣ','2ˣ','xʸ','!','nPr','nCr','(',')','÷','×','−','+'];
 const esc = (s) => String(s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 function shell() {
  app.innerHTML = `<div class="shell">
@@ -64,8 +64,11 @@ function calcKey(k,sci){
  if(k==='±') return set(v.startsWith('-')?v.slice(1):'-'+v);
  if(k==='nPr'||k==='nCr') return set(v+k+'(','0');
  if(k==='!') return set(v+'!','0');
+ if(k==='10ˣ') return set(v+'10^(','0');
+ if(k==='2ˣ') return set(v+'2^(','0');
+ if(k==='xʸ') return set(v+'^','0');
  if(k==='%') return set(v+'/100');
- const map={'×':'*','÷':'/','−':'-','π':'pi','√':'sqrt(','ln':'log(','log':'log10(','sin':'sin(','cos':'cos(','tan':'tan(','asin':'asin(','acos':'acos(','atan':'atan(','x²':'^2'};
+ const map={'×':'*','÷':'/','−':'-','π':'pi','√':'sqrt(','ln':'log(','log':'log10(','sin':'sin(','cos':'cos(','tan':'tan(','asin':'asin(','acos':'acos(','atan':'atan(','x²':'^2','10ˣ':'10^(','2ˣ':'2^(','xʸ':'^('};
  set(v+(map[k]??k),'0');
 }
 function normalizePowers(s){const sup={'⁰':'0','¹':'1','²':'2','³':'3','⁴':'4','⁵':'5','⁶':'6','⁷':'7','⁸':'8','⁹':'9','⁻':'-','⁺':'+'};return String(s).replace(/[⁰¹²³⁴⁵⁶⁷⁸⁹⁻⁺]+/g,m=>'^('+[...m].map(c=>sup[c]).join('')+')').replace(/x\s*\^\s*\(([-+]?\d+)\)/g,'x^$1');}
