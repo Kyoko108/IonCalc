@@ -42,13 +42,13 @@ export function runTransient(parts,wires,{stopTime=0.01,step=0.0001}={}){
   vs.forEach((p,i)=>{const k=n+i,a=node(p,0),d=node(p,1);if(a>=0){A[a][k]++;A[k][a]++;}if(d>=0){A[d][k]--;A[k][d]--;}b[k]=Number(p.value)||0;});
   ls.forEach((p,i)=>{const k=n+vs.length+i,a=node(p,0),d=node(p,1),L=Number(p.value);if(!(L>0))throw Error(p.ref+': inductance must be positive.');if(a>=0){A[a][k]++;A[k][a]++;}if(d>=0){A[d][k]--;A[k][d]--;}A[k][k]=-L/dt;b[k]=-L/dt*(indPrev.get(p.id)||0);});
   const x=solveLinear(A,b);
-  parts.filter(p=>p.type==='capacitor').forEach(p=>{const a=node(p,0),d=node(p,1);capPrev.set(p.id,(a>=0?x[a]:0)-(d>=0?x[d]:0));});
   ls.forEach((p,i)=>indPrev.set(p.id,x[n+vs.length+i]));
   const nodeValues={};for(const [root,index] of ids)nodeValues['N'+(index+1)]=x[index];
   const voltage=(p)=>{const a=node(p,0),d=node(p,1);return (a>=0?x[a]:0)-(d>=0?x[d]:0);};
   const currents={};
   parts.forEach(p=>{if(p.type==='resistor')currents[p.ref]=voltage(p)/Number(p.value);else if(p.type==='capacitor')currents[p.ref]=Number(p.value)*(sample===0?0:(voltage(p)-(capPrev.get(p.id)||0))/dt);else if(p.type==='inductor')currents[p.ref]=indPrev.get(p.id)||0;else if(p.type==='current')currents[p.ref]=Number(p.value)||0;else if(p.type==='voltage')currents[p.ref]=x[n+vs.indexOf(p)];});
   rows.push({time:t,nodes:nodeValues,currents});
+  parts.filter(p=>p.type==='capacitor').forEach(p=>{const a=node(p,0),d=node(p,1);capPrev.set(p.id,(a>=0?x[a]:0)-(d>=0?x[d]:0));});
  }
  return {samples:rows,step,stopTime:rows[rows.length-1].time,method:'Backward Euler'};
 }
