@@ -6,6 +6,8 @@
 
 ### Calculators and engineering tools
 - **Analog Circuit Lab** replaces the standard calculator as the opening workspace, with an LTspice-inspired schematic editor and component library.
+  - Circuit models: nonlinear Shockley diode, simplified NPN BJT, square-law NMOS, finite-gain rail-limited op-amp, VCVS/VCCS/CCVS/CCCS, R/C/L and independent sources. DC operating point and backward-Euler transient analysis expose node voltages and device currents.
+  - Educational model limitations: not vendor-compatible SPICE; no PNP/PMOS, MOSFET body diode, full Gummel-Poon, op-amp frequency response/slew-rate, temperature/noise, AC sweep, or adaptive time stepping.
 - **Scientific calculator** with trigonometry, inverse trigonometry, logarithms, roots, powers, constants, and parentheses.
 - **Calculus tools:** symbolic differentiation and numerical definite integration using Simpson's rule; the function expression field uses text input for a full QWERTY keyboard.
 - **Everyday utilities:** age calculator, GST estimator, bill splitter, currency converter, and unit converter.
