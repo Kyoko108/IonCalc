@@ -37,7 +37,7 @@ function renderCircuitLab(host){
  const $=q=>host.querySelector(q),svg=$('#cl-svg');
  const groups={PASSIVES:['resistor','capacitor','inductor','diode'],SOURCES:['voltage','current','vcv','vccs','ccvs','cccs'],SEMICONDUCTORS:['opamp','mosfet','bjt'],INSTRUMENTS:['voltmeter','ammeter','scope','ground']};
  $('#cl-library').innerHTML=Object.entries(groups).map(([g,types])=>'<div class="cl-group-title">'+g+'</div>'+types.map(t=>'<button data-add="'+t+'">'+defs[t].ref+' · '+defs[t].label+'</button>').join('')).join('');
- function pin(p,i){const [x,y]=defs[p.type].pins[i];return [p.x+x,p.y+y];}
+ function pin(p,i){const [x,y]=defs[p.type].pins[i],a=(p.rotation||0)*Math.PI/180;return [p.x+x*Math.cos(a)-y*Math.sin(a),p.y+x*Math.sin(a)+y*Math.cos(a)];}
  function symbol(p){const sh=defs[p.type].shape;
  if(sh==='resistor')return '<path class="cl-symbol" d="M-42 0H-25L-18 -12L-6 12L6 -12L18 12L25 0H42"/>';
  if(sh==='capacitor')return '<path class="cl-symbol" d="M-42 0H-7M-7 -18V18M7 -18V18M7 0H42"/>';
@@ -70,7 +70,21 @@ function renderCircuitLab(host){
  $('#cl-export').onclick=()=>{const blob=new Blob([JSON.stringify({version:1,parts,wires},null,2)],{type:'application/json'}),url=URL.createObjectURL(blob),a=document.createElement('a');a.href=url;a.download='ioncalc-circuit.json';a.click();URL.revokeObjectURL(url);};
  $('#cl-import').onclick=()=>$('#cl-file').click();
  $('#cl-file').onchange=async e=>{try{const data=JSON.parse(await e.target.files[0].text());if(!Array.isArray(data.parts)||!Array.isArray(data.wires)||data.parts.some(p=>!defs[p.type]))throw Error('Invalid circuit file.');parts=data.parts;wires=data.wires;nextId=Math.max(0,...parts.map(p=>p.id))+1;selected=null;draw();status('Circuit imported','Loaded '+parts.length+' components and '+wires.length+' wires.');}catch(err){status('Import failed',err.message);}e.target.value='';};
- $('#cl-run').onclick=()=>{const unsupported=parts.filter(p=>!['resistor','voltage','ground'].includes(p.type));if(unsupported.length){status('Simulation model unavailable','The schematic editor supports these components, but DC solving currently supports only ideal independent voltage sources, resistors and ground. Unsupported: '+unsupported.map(p=>p.ref+' ('+defs[p.type].label+')').join(', ')+'.');return;}if(parts.some(p=>p.type==='current')){status('Simulation model unavailable','Independent current-source stamping is not enabled yet.');return;}status('DC solver status','The existing DC solver is being upgraded for this component set. Do not treat schematic placement as validated simulation.');};
+ $('#cl-run').onclick=()=>{const unsupported=parts.filter(p=>!['resistor','voltage','ground'].includes(p.type));if(unsupported.length){status('Simulation model unavailable','The schematic editor supports these components, but the DC solver currently supports only ideal independent voltage sources, resistors and ground. Unsupported: '+unsupported.map(p=>p.ref+' ('+defs[p.type].label+')').join(', ')+'.');return;}try{const out=solveDc();if(out.error){status('Simulation stopped',out.error);return;}$('#cl-output').innerHTML='<strong>DC operating point · limited solver</strong><table>'+out.nodes.map((v,i)=>'<tr><td>Node '+i+'</td><td>'+v.toFixed(6)+' V</td></tr>').join('')+'</table><p>Only ideal DC voltage sources, resistors and ground are included in this solver.</p>';}catch(e){status('Simulation stopped',e.message);}};
+ function solveDc(){
+  if(!parts.some(p=>p.type==='ground'))return {error:'Place a ground reference.'};
+  const parent=new Map(),key=(id,i)=>id+':'+i;const all=parts.flatMap(p=>defs[p.type].pins.map((_,i)=>key(p.id,i)));all.forEach(k=>parent.set(k,k));
+  const find=k=>{let r=k;while(parent.get(r)!==r)r=parent.get(r);while(parent.get(k)!==k){const n=parent.get(k);parent.set(k,r);k=n;}return r;};
+  wires.forEach(w=>{const a=find(key(w.a,w.ai)),b=find(key(w.b,w.bi));if(a!==b)parent.set(a,b);});
+  const g=find(key(parts.find(p=>p.type==='ground').id,0)),ids=new Map();all.forEach(k=>{const r=find(k);if(r!==g&&!ids.has(r))ids.set(r,ids.size+1);});
+  const n=ids.size,src=parts.filter(p=>p.type==='voltage'),N=n+src.length;if(!N)return {error:'Connect circuit nodes with wires.'};
+  const A=Array.from({length:N},()=>Array(N+1).fill(0)),node=(p,i)=>ids.get(find(key(p.id,i)))||0;
+  const conduct=(a,b,v)=>{if(a)A[a-1][a-1]+=v;if(b)A[b-1][b-1]+=v;if(a&&b){A[a-1][b-1]-=v;A[b-1][a-1]-=v;}};
+  parts.filter(p=>p.type==='resistor').forEach(p=>{const r=Number(p.value);if(!(r>0))throw Error('Resistance must be positive.');conduct(node(p,0),node(p,1),1/r);});
+  src.forEach((p,i)=>{const a=node(p,0),b=node(p,1),k=n+i;if(a){A[a-1][k]++;A[k][a-1]++;}if(b){A[b-1][k]--;A[k][b-1]--;}A[k][N]=Number(p.value);});
+  for(let i=0;i<N;i++){let q=i;for(let j=i+1;j<N;j++)if(Math.abs(A[j][i])>Math.abs(A[q][i]))q=j;if(Math.abs(A[q][i])<1e-12)return {error:'Singular circuit matrix: check floating nodes and source loops.'};[A[i],A[q]]=[A[q],A[i]];const d=A[i][i];for(let k=i;k<=N;k++)A[i][k]/=d;for(let j=0;j<N;j++)if(j!==i){const v=A[j][i];for(let k=i;k<=N;k++)A[j][k]-=v*A[i][k];}}
+  const values=[0];for(let i=1;i<=n;i++)values.push(A[i-1][N]);return {nodes:values};
+ }
  draw();
 }
 export {renderCircuitLab};
