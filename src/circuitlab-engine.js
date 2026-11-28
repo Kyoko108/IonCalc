@@ -107,9 +107,6 @@ export function runTransient(parts,wires,{stopTime=.01,step=.0001}={}){
  const samples=Math.floor(stopTime/step)+1;
  for(let k=0;k<samples;k++){const t=k*step,result=solveNetwork(parts,wires,{mode:'transient',dt:step,capPrev,indPrev,guess});guess=result.x;
   const nodes={...result.nodes},currents={...result.currents};rows.push({time:t,nodes,currents});
-  parts.filter(p=>p.type==='capacitor').forEach(p=>{const a=parts.find(q=>q.id===p.id);const old=capPrev.get(p.id)||0;const v=Object.values(nodes); // update using branch current relation below
-   const keys=Object.keys(nodes);const idx0=keys.indexOf('N'+(0+1));void a;void old;void v;void idx0;
-  });
   // Capacitor state is the terminal differential voltage, obtained from the node union map.
   const topo=topology(parts,wires);parts.filter(p=>p.type==='capacitor').forEach(p=>{const a=topo.node(p,0),b=topo.node(p,1),va=a<0?0:result.x[a],vb=b<0?0:result.x[b];capPrev.set(p.id,va-vb);});
   parts.filter(p=>p.type==='inductor').forEach(p=>indPrev.set(p.id,result.currents[p.ref]||0));
